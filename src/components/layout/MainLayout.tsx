@@ -50,6 +50,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
     { to: '/jobs', label: 'Jobs', icon: <Briefcase size={20} /> },
     { to: '/resources', label: 'Resources', icon: <BookOpen size={20} /> },
     { to: '/about', label: 'About', icon: <Info size={20} /> },
+    { to: '/contact', label: 'Contact', icon: <MessageCircle size={20} /> },
     { to: '/profile', label: 'Profile', icon: <User size={20} /> },
   ];
   
