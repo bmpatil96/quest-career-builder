@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { 
@@ -8,8 +8,10 @@ import {
   User, 
   Home, 
   Menu, 
-  X
+  X,
+  Info
 } from 'lucide-react';
+import { setupScrollAnimations } from '@/utils/animationUtils';
 
 interface NavItemProps {
   to: string;
@@ -38,10 +40,16 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
+  useEffect(() => {
+    const cleanupAnimation = setupScrollAnimations();
+    return cleanupAnimation;
+  }, [location.pathname]);
+  
   const navItems = [
     { to: '/', label: 'Home', icon: <Home size={20} /> },
     { to: '/jobs', label: 'Jobs', icon: <Briefcase size={20} /> },
     { to: '/resources', label: 'Resources', icon: <BookOpen size={20} /> },
+    { to: '/about', label: 'About', icon: <Info size={20} /> },
     { to: '/profile', label: 'Profile', icon: <User size={20} /> },
   ];
   

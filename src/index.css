@@ -106,3 +106,25 @@
     @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
   }
 }
+
+/* Animation for page transitions and scroll effects */
+.animate-on-scroll {
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.animate-on-scroll.opacity-0 {
+  transform: translateY(20px);
+}
+
+/* Animation for items that should appear with a delay */
+.animate-delay-100 {
+  transition-delay: 100ms;
+}
+
+.animate-delay-200 {
+  transition-delay: 200ms;
+}
+
+.animate-delay-300 {
+  transition-delay: 300ms;
+}
