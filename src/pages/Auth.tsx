@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -30,8 +29,10 @@ const registerSchema = z.object({
   userType: z.enum(["jobSeeker", "recruiter"], { 
     required_error: "Please select a user type" 
   }),
-  terms: z.literal(true, {
-    errorMap: () => ({ message: "You must accept the terms and conditions" }),
+  terms: z.boolean({
+    required_error: "You must accept the terms and conditions",
+  }).refine(val => val === true, {
+    message: "You must accept the terms and conditions",
   }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords do not match",
