@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Briefcase, MapPin, DollarSign, Clock, CalendarDays, Search } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import BookmarkButton from '@/components/BookmarkButton';
+import Notifications from '@/components/Notifications';
+import { setupScrollAnimations } from '@/utils/animationUtils';
 
 // Mock job data
 const jobListings = [
@@ -82,6 +85,21 @@ const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState('');
   const [filterLocation, setFilterLocation] = useState('');
+  const [bookmarkedJobs, setBookmarkedJobs] = useState<number[]>([]);
+  
+  useEffect(() => {
+    const cleanup = setupScrollAnimations();
+    return cleanup;
+  }, []);
+
+  // Handle job bookmark change
+  const handleBookmarkChange = (jobId: number | string, isBookmarked: boolean) => {
+    if (isBookmarked) {
+      setBookmarkedJobs(prev => [...prev, Number(jobId)]);
+    } else {
+      setBookmarkedJobs(prev => prev.filter(id => id !== Number(jobId)));
+    }
+  };
 
   // Filter jobs based on search term and filters
   const filteredJobs = jobListings.filter(job => {
@@ -101,14 +119,14 @@ const Jobs = () => {
       {/* Header Section */}
       <section className="bg-brand-blue text-white py-12 md:py-16">
         <div className="container px-4 md:px-6">
-          <div className="text-center max-w-3xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto animate-on-scroll opacity-0">
             <h1 className="text-3xl md:text-4xl font-bold mb-4">Find Your Dream Job</h1>
             <p className="text-lg md:text-xl opacity-90 mb-8">
               Browse through thousands of job listings to find the perfect opportunity for your career.
             </p>
             
             {/* Search Form */}
-            <div className="bg-white rounded-lg p-2 flex flex-col md:flex-row gap-2">
+            <div className="bg-white rounded-lg p-2 flex flex-col md:flex-row gap-2 animate-on-scroll opacity-0 animate-delay-100">
               <div className="relative flex-grow">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
                 <Input 
@@ -132,7 +150,7 @@ const Jobs = () => {
         <div className="container px-4 md:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Filters Sidebar */}
-            <div className="lg:col-span-1">
+            <div className="lg:col-span-1 animate-on-scroll opacity-0">
               <Card>
                 <CardHeader>
                   <CardTitle>Filters</CardTitle>
@@ -145,7 +163,7 @@ const Jobs = () => {
                         <SelectValue placeholder="All Types" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all-types">All Types</SelectItem>
+                        <SelectItem value="">All Types</SelectItem>
                         <SelectItem value="Full-time">Full-time</SelectItem>
                         <SelectItem value="Part-time">Part-time</SelectItem>
                         <SelectItem value="Contract">Contract</SelectItem>
@@ -161,7 +179,7 @@ const Jobs = () => {
                         <SelectValue placeholder="All Locations" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="all-locations">All Locations</SelectItem>
+                        <SelectItem value="">All Locations</SelectItem>
                         <SelectItem value="San Francisco">San Francisco</SelectItem>
                         <SelectItem value="New York">New York</SelectItem>
                         <SelectItem value="Remote">Remote</SelectItem>
@@ -210,7 +228,7 @@ const Jobs = () => {
             
             {/* Job Listings */}
             <div className="lg:col-span-3">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center mb-6 animate-on-scroll opacity-0">
                 <h2 className="text-2xl font-bold">
                   {filteredJobs.length} Job{filteredJobs.length !== 1 ? 's' : ''} Found
                 </h2>
@@ -226,8 +244,8 @@ const Jobs = () => {
               
               {filteredJobs.length > 0 ? (
                 <div className="space-y-4">
-                  {filteredJobs.map((job) => (
-                    <Card key={job.id} className="card-hover">
+                  {filteredJobs.map((job, index) => (
+                    <Card key={job.id} className="card-hover animate-on-scroll opacity-0" style={{animationDelay: `${index * 100}ms`}}>
                       <CardContent className="p-6">
                         <div className="flex justify-between items-start mb-2">
                           <div>
@@ -271,14 +289,18 @@ const Jobs = () => {
                       </CardContent>
                       
                       <CardFooter className="bg-gray-50 border-t p-4 flex justify-between">
-                        <Button variant="outline" size="sm">Save Job</Button>
+                        <BookmarkButton 
+                          jobId={job.id} 
+                          initialBookmarked={bookmarkedJobs.includes(job.id)}
+                          onBookmarkChange={(isBookmarked) => handleBookmarkChange(job.id, isBookmarked)}
+                        />
                         <Button size="sm">Apply Now</Button>
                       </CardFooter>
                     </Card>
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-white rounded-lg border">
+                <div className="text-center py-12 bg-white rounded-lg border animate-on-scroll opacity-0">
                   <div className="mb-4">
                     <Briefcase className="h-12 w-12 mx-auto text-gray-300" />
                   </div>

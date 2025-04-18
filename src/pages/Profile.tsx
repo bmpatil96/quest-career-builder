@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,8 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { Briefcase, BookOpen, Star, Award, Edit, Settings, FileText, Clock, MapPin, Mail, Phone, Globe, Bookmark, CheckCircle } from 'lucide-react';
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Briefcase, BookOpen, Star, Award, Edit, Settings, FileText, Clock, MapPin, Mail, Phone, Globe, Bookmark, CheckCircle, School, Plus, Trash, Camera } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import ResumeUpload from '@/components/ResumeUpload';
+import BookmarkButton from '@/components/BookmarkButton';
+import { setupScrollAnimations } from '@/utils/animationUtils';
 
 // Mock user data
 const userData = {
@@ -98,6 +104,32 @@ const userData = {
 
 const Profile = () => {
   const [profileProgress, setProfileProgress] = useState(85);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [profileData, setProfileData] = useState(userData);
+  
+  useEffect(() => {
+    const cleanup = setupScrollAnimations();
+    return cleanup;
+  }, []);
+
+  // Handler for form fields changes
+  const handleInputChange = (field: string, value: string) => {
+    setProfileData({
+      ...profileData,
+      [field]: value
+    });
+  };
+
+  const handleSaveProfile = () => {
+    setIsEditMode(false);
+    // In a real app, you would save the data to your backend here
+    console.log('Saving profile data:', profileData);
+  };
+
+  const handleFileUpload = (file: File) => {
+    console.log('Resume uploaded:', file.name);
+    // In a real app, you would upload the file to your backend or storage service
+  };
   
   return (
     <MainLayout>
@@ -105,30 +137,45 @@ const Profile = () => {
       <div className="bg-gradient-to-r from-brand-blue to-brand-purple text-white py-12">
         <div className="container px-4 md:px-6">
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <Avatar className="w-24 h-24 border-4 border-white">
-              <AvatarImage src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt={userData.name} />
-              <AvatarFallback>{userData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-            </Avatar>
+            <div className="relative">
+              <Avatar className="w-24 h-24 border-4 border-white">
+                <AvatarImage src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt={profileData.name} />
+                <AvatarFallback>{profileData.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+              </Avatar>
+              <Button size="icon" variant="secondary" className="absolute -bottom-2 -right-2 rounded-full h-8 w-8">
+                <Camera className="h-4 w-4" />
+              </Button>
+            </div>
             
             <div className="text-center md:text-left">
-              <h1 className="text-3xl font-bold">{userData.name}</h1>
-              <p className="text-xl opacity-90 mb-2">{userData.title}</p>
+              <h1 className="text-3xl font-bold">{profileData.name}</h1>
+              <p className="text-xl opacity-90 mb-2">{profileData.title}</p>
               <div className="flex flex-wrap justify-center md:justify-start gap-2 mt-2">
                 <div className="flex items-center text-sm">
                   <MapPin className="h-4 w-4 mr-1" />
-                  <span>{userData.location}</span>
+                  <span>{profileData.location}</span>
                 </div>
                 <div className="flex items-center text-sm">
                   <Mail className="h-4 w-4 mr-1" />
-                  <span>{userData.email}</span>
+                  <span>{profileData.email}</span>
                 </div>
               </div>
             </div>
             
             <div className="flex gap-2 ml-auto md:self-start">
-              <Button variant="outline" className="bg-transparent border-white hover:bg-white hover:text-brand-blue">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Profile
+              <Button 
+                variant={isEditMode ? "default" : "outline"} 
+                className={isEditMode ? "bg-white text-brand-blue hover:bg-gray-100" : "bg-transparent border-white hover:bg-white hover:text-brand-blue"}
+                onClick={() => isEditMode ? handleSaveProfile() : setIsEditMode(true)}
+              >
+                {isEditMode ? (
+                  <>Save Profile</>
+                ) : (
+                  <>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Profile
+                  </>
+                )}
               </Button>
               <Button variant="outline" className="bg-transparent border-white hover:bg-white hover:text-brand-blue">
                 <Settings className="h-4 w-4" />
@@ -161,39 +208,81 @@ const Profile = () => {
           <div className="space-y-6">
             {/* About Card */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle>About</CardTitle>
+                {isEditMode && <Button variant="ghost" size="sm"><Edit className="h-4 w-4" /></Button>}
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">{userData.about}</p>
+                {isEditMode ? (
+                  <Textarea 
+                    value={profileData.about}
+                    onChange={(e) => handleInputChange('about', e.target.value)}
+                    className="mb-4"
+                    rows={5}
+                  />
+                ) : (
+                  <p className="text-gray-600">{profileData.about}</p>
+                )}
                 
                 <Separator className="my-4" />
                 
                 <div className="space-y-3">
-                  <div className="flex items-center">
-                    <Mail className="h-4 w-4 text-gray-500 mr-2" />
-                    <span className="text-sm">{userData.email}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Phone className="h-4 w-4 text-gray-500 mr-2" />
-                    <span className="text-sm">{userData.phone}</span>
-                  </div>
-                  <div className="flex items-center">
-                    <Globe className="h-4 w-4 text-gray-500 mr-2" />
-                    <span className="text-sm">{userData.website}</span>
-                  </div>
+                  {isEditMode ? (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input 
+                          id="email"
+                          value={profileData.email}
+                          onChange={(e) => handleInputChange('email', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone</Label>
+                        <Input 
+                          id="phone"
+                          value={profileData.phone}
+                          onChange={(e) => handleInputChange('phone', e.target.value)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="website">Website</Label>
+                        <Input 
+                          id="website"
+                          value={profileData.website}
+                          onChange={(e) => handleInputChange('website', e.target.value)}
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center">
+                        <Mail className="h-4 w-4 text-gray-500 mr-2" />
+                        <span className="text-sm">{profileData.email}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Phone className="h-4 w-4 text-gray-500 mr-2" />
+                        <span className="text-sm">{profileData.phone}</span>
+                      </div>
+                      <div className="flex items-center">
+                        <Globe className="h-4 w-4 text-gray-500 mr-2" />
+                        <span className="text-sm">{profileData.website}</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
             
             {/* Skills Card */}
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle>Skills</CardTitle>
+                {isEditMode && <Button variant="ghost" size="sm"><Plus className="h-4 w-4" /></Button>}
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {userData.skills.map((skill, index) => (
+                  {profileData.skills.map((skill, index) => (
                     <div key={index}>
                       <div className="flex justify-between mb-1 text-sm">
                         <span>{skill.name}</span>
@@ -211,6 +300,9 @@ const Profile = () => {
                 </Button>
               </CardFooter>
             </Card>
+
+            {/* Resume Upload Card */}
+            <ResumeUpload onFileUpload={handleFileUpload} />
           </div>
           
           {/* Main Content */}
@@ -239,14 +331,14 @@ const Profile = () => {
                     <div className="flex justify-between items-center">
                       <CardTitle>Work Experience</CardTitle>
                       <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4 mr-2" />
+                        <Plus className="h-4 w-4 mr-2" />
                         Add Experience
                       </Button>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                      {userData.experience.map((exp) => (
+                      {profileData.experience.map((exp) => (
                         <div key={exp.id} className="relative pl-6 border-l-2 border-gray-200 pb-6 last:pb-0">
                           <div className="absolute w-4 h-4 bg-brand-blue rounded-full -left-[9px] top-0" />
                           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-1 mb-2">
@@ -260,6 +352,12 @@ const Profile = () => {
                             </Badge>
                           </div>
                           <p className="text-gray-600">{exp.description}</p>
+                          {isEditMode && (
+                            <div className="flex gap-2 mt-2">
+                              <Button variant="ghost" size="sm"><Edit className="h-4 w-4" /></Button>
+                              <Button variant="ghost" size="sm"><Trash className="h-4 w-4" /></Button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -274,20 +372,23 @@ const Profile = () => {
                     <div className="flex justify-between items-center">
                       <CardTitle>Education</CardTitle>
                       <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4 mr-2" />
+                        <Plus className="h-4 w-4 mr-2" />
                         Add Education
                       </Button>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-6">
-                      {userData.education.map((edu) => (
+                      {profileData.education.map((edu) => (
                         <div key={edu.id} className="relative pl-6 border-l-2 border-gray-200 pb-6 last:pb-0">
                           <div className="absolute w-4 h-4 bg-brand-purple rounded-full -left-[9px] top-0" />
                           <div className="flex flex-col md:flex-row md:justify-between md:items-start gap-1 mb-2">
                             <div>
                               <h3 className="text-lg font-semibold">{edu.degree}</h3>
-                              <p className="text-brand-purple">{edu.school}</p>
+                              <p className="text-brand-purple flex items-center">
+                                <School className="h-4 w-4 mr-1" />
+                                {edu.school}
+                              </p>
                             </div>
                             <Badge variant="outline" className="md:self-start whitespace-nowrap">
                               <Clock className="h-3 w-3 mr-1" />
@@ -295,6 +396,12 @@ const Profile = () => {
                             </Badge>
                           </div>
                           <p className="text-gray-600">{edu.description}</p>
+                          {isEditMode && (
+                            <div className="flex gap-2 mt-2">
+                              <Button variant="ghost" size="sm"><Edit className="h-4 w-4" /></Button>
+                              <Button variant="ghost" size="sm"><Trash className="h-4 w-4" /></Button>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -310,7 +417,7 @@ const Profile = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {userData.savedJobs.map((job) => (
+                      {profileData.savedJobs.map((job) => (
                         <div key={job.id} className="flex justify-between items-start p-4 border rounded-lg hover:bg-gray-50 transition-colors">
                           <div>
                             <h3 className="font-semibold">{job.title}</h3>
@@ -322,14 +429,23 @@ const Profile = () => {
                               <span>Posted {job.posted}</span>
                             </div>
                           </div>
-                          <Badge className={
-                            job.status === "Applied" ? "bg-blue-100 text-blue-800 hover:bg-blue-100" :
-                            job.status === "Interview" ? "bg-green-100 text-green-800 hover:bg-green-100" :
-                            "bg-gray-100 text-gray-800 hover:bg-gray-100"
-                          }>
-                            {job.status === "Applied" && <CheckCircle className="h-3 w-3 mr-1" />}
-                            {job.status}
-                          </Badge>
+                          <div className="flex flex-col items-end gap-2">
+                            <Badge className={
+                              job.status === "Applied" ? "bg-blue-100 text-blue-800 hover:bg-blue-100" :
+                              job.status === "Interview" ? "bg-green-100 text-green-800 hover:bg-green-100" :
+                              "bg-gray-100 text-gray-800 hover:bg-gray-100"
+                            }>
+                              {job.status === "Applied" && <CheckCircle className="h-3 w-3 mr-1" />}
+                              {job.status}
+                            </Badge>
+                            <BookmarkButton 
+                              jobId={job.id} 
+                              initialBookmarked={true} 
+                              size="sm" 
+                              variant="ghost"
+                              showText={false}
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>
