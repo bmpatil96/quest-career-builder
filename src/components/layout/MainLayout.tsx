@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,8 @@ import {
   Home, 
   Menu, 
   X,
-  Info
+  Info,
+  MessageCircle
 } from 'lucide-react';
 import { setupScrollAnimations } from '@/utils/animationUtils';
 
