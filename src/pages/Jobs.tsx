@@ -83,8 +83,8 @@ const jobListings = [
 
 const Jobs = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('');
-  const [filterLocation, setFilterLocation] = useState('');
+  const [filterType, setFilterType] = useState('all');
+  const [filterLocation, setFilterLocation] = useState('all');
   const [bookmarkedJobs, setBookmarkedJobs] = useState<number[]>([]);
   
   useEffect(() => {
@@ -108,8 +108,8 @@ const Jobs = () => {
                            job.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            job.tags.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesType = filterType ? job.type === filterType : true;
-    const matchesLocation = filterLocation ? job.location.includes(filterLocation) : true;
+    const matchesType = filterType === 'all' ? true : job.type === filterType;
+    const matchesLocation = filterLocation === 'all' ? true : job.location.includes(filterLocation);
     
     return matchesSearch && matchesType && matchesLocation;
   });
@@ -163,7 +163,7 @@ const Jobs = () => {
                         <SelectValue placeholder="All Types" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Types</SelectItem>
+                        <SelectItem value="all">All Types</SelectItem>
                         <SelectItem value="Full-time">Full-time</SelectItem>
                         <SelectItem value="Part-time">Part-time</SelectItem>
                         <SelectItem value="Contract">Contract</SelectItem>
@@ -179,7 +179,7 @@ const Jobs = () => {
                         <SelectValue placeholder="All Locations" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">All Locations</SelectItem>
+                        <SelectItem value="all">All Locations</SelectItem>
                         <SelectItem value="San Francisco">San Francisco</SelectItem>
                         <SelectItem value="New York">New York</SelectItem>
                         <SelectItem value="Remote">Remote</SelectItem>
@@ -217,8 +217,8 @@ const Jobs = () => {
                 <CardFooter>
                   <Button variant="outline" className="w-full" onClick={() => {
                     setSearchTerm('');
-                    setFilterType('');
-                    setFilterLocation('');
+                    setFilterType('all');
+                    setFilterLocation('all');
                   }}>
                     Reset Filters
                   </Button>
@@ -308,8 +308,8 @@ const Jobs = () => {
                   <p className="text-gray-500 mb-4">Try adjusting your search or filters.</p>
                   <Button variant="outline" onClick={() => {
                     setSearchTerm('');
-                    setFilterType('');
-                    setFilterLocation('');
+                    setFilterType('all');
+                    setFilterLocation('all');
                   }}>
                     Reset All Filters
                   </Button>
