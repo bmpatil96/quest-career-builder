@@ -75,7 +75,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                 {item.label}
               </Link>
             ))}
-            <Button>Sign In</Button>
+            <Link to="/auth">
+              <Button>Sign In</Button>
+            </Link>
           </nav>
           
           {/* Mobile Menu Toggle */}
@@ -102,7 +104,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
                   active={location.pathname === item.to}
                 />
               ))}
-              <Button className="w-full mt-2">Sign In</Button>
+              <Link to="/auth" className="w-full mt-2">
+                <Button className="w-full">Sign In</Button>
+              </Link>
             </nav>
           </div>
         )}
